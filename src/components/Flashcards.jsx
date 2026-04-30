@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
-import '../index.css';
+import { ChevronLeft, ChevronRight, RotateCcw, Lightbulb } from 'lucide-react';
 
 const FLASHCARD_DATA = [
   {
@@ -49,7 +48,7 @@ const Flashcards = () => {
     setIsFlipped(false);
     setTimeout(() => {
       setCurrentIndex((prev) => (prev + 1) % FLASHCARD_DATA.length);
-    }, 150); // Small delay to allow flip animation to reset
+    }, 150);
   };
 
   const handlePrev = () => {
@@ -66,25 +65,19 @@ const Flashcards = () => {
   const currentCard = FLASHCARD_DATA[currentIndex];
 
   return (
-    <section id="flashcards" className="section" style={{ backgroundColor: 'var(--bg-alt)' }}>
+    <section id="flashcards" className="section" style={{ backgroundColor: 'var(--bg-main)' }}>
       <div className="container">
-        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-          <span style={{
-            display: 'inline-block',
-            padding: '0.25rem 1rem',
-            backgroundColor: 'rgba(255,153,51,0.1)',
-            color: 'var(--primary)',
-            borderRadius: '2rem',
-            fontWeight: 600,
-            marginBottom: '1rem'
-          }}>
-            Terminology
-          </span>
-          <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--text-main)' }}>
-            Election Flashcards
-          </h2>
-          <p style={{ color: 'var(--text-muted)', maxWidth: '600px', margin: '0 auto', fontSize: '1.1rem' }}>
-            Test your knowledge of key election terms and concepts. Click the card to flip it!
+        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+          <span style={{ 
+            color: 'var(--primary)', 
+            fontWeight: 800, 
+            fontSize: '0.9rem', 
+            textTransform: 'uppercase', 
+            letterSpacing: '0.1em' 
+          }}>Glossary</span>
+          <h2 style={{ fontSize: '3rem', marginTop: '0.5rem' }}>Election <span className="gradient-text">Flashcards</span></h2>
+          <p style={{ color: 'var(--text-muted)', maxWidth: '600px', margin: '1.5rem auto 0 auto', fontSize: '1.1rem' }}>
+            Click to flip the cards and master key election terminology.
           </p>
         </div>
 
@@ -92,7 +85,7 @@ const Flashcards = () => {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          maxWidth: '600px',
+          maxWidth: '650px',
           margin: '0 auto'
         }}>
           
@@ -102,54 +95,71 @@ const Flashcards = () => {
             onClick={handleFlip}
             style={{
               width: '100%',
-              height: '350px',
-              perspective: '1000px',
+              height: '400px',
+              perspective: '1500px',
               cursor: 'pointer',
-              marginBottom: '2rem'
+              marginBottom: '3rem'
             }}
           >
             <div className="flashcard-inner" style={{
               width: '100%',
               height: '100%',
               position: 'relative',
-              transition: 'transform 0.6s',
+              transition: 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)',
               transformStyle: 'preserve-3d',
               transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)'
             }}>
               
               {/* Front of Card */}
-              <div className="flashcard-front" style={{
+              <div className="flashcard-front card" style={{
                 position: 'absolute',
                 width: '100%',
                 height: '100%',
                 backfaceVisibility: 'hidden',
-                backgroundColor: 'white',
-                borderRadius: '1rem',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
-                padding: '2rem',
-                border: '2px solid var(--border)'
+                padding: '3rem',
+                backgroundColor: 'white',
+                border: '1px solid var(--border)',
+                boxShadow: 'var(--shadow-lg)'
               }}>
                 <span style={{
                   position: 'absolute',
-                  top: '1rem',
-                  right: '1rem',
-                  fontSize: '0.85rem',
-                  color: 'var(--text-muted)',
-                  backgroundColor: 'var(--bg-main)',
-                  padding: '4px 10px',
-                  borderRadius: '12px'
+                  top: '1.5rem',
+                  right: '1.5rem',
+                  fontSize: '0.75rem',
+                  fontWeight: 800,
+                  color: 'var(--accent)',
+                  backgroundColor: 'var(--bg-alt)',
+                  padding: '6px 14px',
+                  borderRadius: 'var(--radius-full)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
                 }}>
                   {currentCard.category}
                 </span>
-                <h3 style={{ fontSize: '3rem', color: 'var(--primary)', textAlign: 'center', margin: 0 }}>
+                
+                <div style={{ color: 'var(--primary)', marginBottom: '2rem' }}>
+                   <Lightbulb size={64} strokeWidth={1} />
+                </div>
+                
+                <h3 style={{ fontSize: '3.5rem', color: 'var(--text-main)', textAlign: 'center', margin: 0, letterSpacing: '-0.03em' }}>
                   {currentCard.term}
                 </h3>
-                <p style={{ position: 'absolute', bottom: '1.5rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <RotateCcw size={16} /> Click to reveal
+                
+                <p style={{ 
+                  position: 'absolute', 
+                  bottom: '2rem', 
+                  color: 'var(--text-muted)', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '8px',
+                  fontWeight: 600,
+                  fontSize: '0.9rem'
+                }}>
+                  <RotateCcw size={16} /> Click to flip
                 </p>
               </div>
 
@@ -159,19 +169,20 @@ const Flashcards = () => {
                 width: '100%',
                 height: '100%',
                 backfaceVisibility: 'hidden',
-                backgroundColor: 'var(--primary)',
+                backgroundColor: 'var(--accent)',
                 color: 'white',
-                borderRadius: '1rem',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
+                borderRadius: 'var(--radius-lg)',
+                boxShadow: 'var(--shadow-lg)',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
-                padding: '2.5rem',
-                transform: 'rotateY(180deg)'
+                padding: '3.5rem',
+                transform: 'rotateY(180deg)',
+                background: 'linear-gradient(135deg, var(--accent) 0%, #000040 100%)'
               }}>
-                <h4 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', opacity: 0.9 }}>{currentCard.term}</h4>
-                <p style={{ fontSize: '1.25rem', lineHeight: 1.6, textAlign: 'center', margin: 0 }}>
+                <h4 style={{ fontSize: '1.4rem', marginBottom: '2rem', opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{currentCard.term}</h4>
+                <p style={{ fontSize: '1.5rem', lineHeight: 1.5, textAlign: 'center', margin: 0, fontWeight: 500 }}>
                   {currentCard.definition}
                 </p>
               </div>
@@ -183,51 +194,43 @@ const Flashcards = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '2rem',
+            gap: '3rem',
             width: '100%'
           }}>
             <button 
-              onClick={handlePrev}
-              className="hover-scale"
+              onClick={(e) => { e.stopPropagation(); handlePrev(); }}
+              className="btn hover-scale"
               style={{
                 backgroundColor: 'white',
                 border: '1px solid var(--border)',
                 borderRadius: '50%',
-                width: '50px',
-                height: '50px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
+                width: '60px',
+                height: '60px',
                 color: 'var(--text-main)',
-                boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
+                boxShadow: 'var(--shadow-md)'
               }}
             >
-              <ChevronLeft size={24} />
+              <ChevronLeft size={28} />
             </button>
             
-            <span style={{ fontSize: '1.1rem', color: 'var(--text-muted)', fontWeight: 500 }}>
-              {currentIndex + 1} / {FLASHCARD_DATA.length}
+            <span style={{ fontSize: '1.25rem', color: 'var(--text-main)', fontWeight: 800, fontFamily: 'Outfit' }}>
+              {currentIndex + 1} <span style={{ color: 'var(--text-muted)', fontWeight: 500, fontSize: '1rem' }}>/ {FLASHCARD_DATA.length}</span>
             </span>
 
             <button 
-              onClick={handleNext}
-              className="hover-scale"
+              onClick={(e) => { e.stopPropagation(); handleNext(); }}
+              className="btn hover-scale"
               style={{
                 backgroundColor: 'white',
                 border: '1px solid var(--border)',
                 borderRadius: '50%',
-                width: '50px',
-                height: '50px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
+                width: '60px',
+                height: '60px',
                 color: 'var(--text-main)',
-                boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
+                boxShadow: 'var(--shadow-md)'
               }}
             >
-              <ChevronRight size={24} />
+              <ChevronRight size={28} />
             </button>
           </div>
 

@@ -1,98 +1,106 @@
 import React from 'react';
-import { Calendar, Users, Megaphone, CheckCircle2, Trophy } from 'lucide-react';
+import { phases } from '../data/data';
 
 const Timeline = () => {
-  const phases = [
-    {
-      icon: <Calendar size={24} />,
-      title: "Announcement of Schedule",
-      description: "The Election Commission of India (ECI) announces the election dates, phases, and constituencies. The Model Code of Conduct comes into effect immediately.",
-      color: "var(--primary)"
-    },
-    {
-      icon: <Users size={24} />,
-      title: "Nominations",
-      description: "Candidates file their nomination papers. The ECI scrutinizes these papers and publishes the final list of contesting candidates.",
-      color: "var(--accent)"
-    },
-    {
-      icon: <Megaphone size={24} />,
-      title: "Campaigning",
-      description: "Political parties and candidates hold rallies, distribute manifestos, and campaign. Campaigning ends 48 hours before polling begins.",
-      color: "var(--secondary)"
-    },
-    {
-      icon: <CheckCircle2 size={24} />,
-      title: "Polling Day",
-      description: "Voters cast their votes using Electronic Voting Machines (EVMs) and verify them via Voter Verifiable Paper Audit Trail (VVPAT) at designated polling booths.",
-      color: "var(--primary-dark)"
-    },
-    {
-      icon: <Trophy size={24} />,
-      title: "Counting & Results",
-      description: "Votes are counted under strict security on a pre-determined date, and the results are declared by the Returning Officer.",
-      color: "var(--secondary-light)"
-    }
-  ];
-
   return (
-    <section id="timeline" className="section" style={{ backgroundColor: 'var(--surface-alt)' }}>
+    <section id="timeline" className="section" style={{ backgroundColor: 'var(--bg-alt)' }}>
       <div className="container">
-        <h2 className="section-title">The Election Timeline</h2>
-        <p className="section-subtitle">Understanding the phases of the world's largest democratic exercise.</p>
+        <div style={{ textAlign: 'center', marginBottom: '5rem' }}>
+          <span style={{ 
+            color: 'var(--primary)', 
+            fontWeight: 800, 
+            fontSize: '0.9rem', 
+            textTransform: 'uppercase', 
+            letterSpacing: '0.1em' 
+          }}>Process Journey</span>
+          <h2 style={{ fontSize: '3rem', marginTop: '0.5rem' }}>The Election <span className="gradient-text">Timeline</span></h2>
+        </div>
         
-        <div style={{ position: 'relative', maxWidth: '800px', margin: '0 auto' }}>
+        <div style={{ position: 'relative', maxWidth: '1000px', margin: '0 auto' }}>
           {/* Vertical Line */}
           <div style={{ 
             position: 'absolute', 
-            left: '50px', 
+            left: '32px', 
             top: '0', 
             bottom: '0', 
-            width: '4px', 
-            backgroundColor: 'var(--border)',
-            borderRadius: '4px'
+            width: '2px', 
+            background: 'linear-gradient(to bottom, var(--primary), var(--accent))',
+            opacity: 0.3
           }}></div>
 
-          {phases.map((phase, index) => (
-            <div key={index} className="animate-slide-up" style={{ 
-              display: 'flex', 
-              gap: '2rem', 
-              marginBottom: '3rem',
-              position: 'relative',
-              animationDelay: `${index * 0.15}s`
-            }}>
-              {/* Icon Circle */}
-              <div style={{ 
-                width: '100px', 
-                flexShrink: 0,
-                display: 'flex',
-                justifyContent: 'center',
-                zIndex: 10
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
+            {phases.map((phase, index) => (
+              <div key={index} style={{ 
+                display: 'flex', 
+                gap: '2.5rem', 
+                position: 'relative'
               }}>
-                <div className="hover-scale" style={{
-                  width: '60px',
-                  height: '60px',
-                  borderRadius: '50%',
-                  backgroundColor: phase.color,
-                  color: 'white',
+                {/* Number/Icon indicator */}
+                <div style={{ 
+                  width: '64px', 
+                  height: '64px', 
+                  borderRadius: '50%', 
+                  backgroundColor: 'white',
+                  border: '2px solid var(--primary)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: `0 0 15px ${phase.color}40`,
-                  border: '4px solid var(--surface-alt)',
-                  transition: 'all 0.3s ease'
+                  zIndex: 2,
+                  flexShrink: 0,
+                  boxShadow: 'var(--shadow-md)',
+                  fontSize: '1.2rem',
+                  fontWeight: 800,
+                  color: 'var(--primary)'
                 }}>
-                  {phase.icon}
+                  {phase.num}
+                </div>
+
+                {/* Content Card */}
+                <div className="card" style={{ flex: 1, padding: '2.5rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
+                    <div>
+                       <span style={{ 
+                         backgroundColor: `var(--${phase.badgeType})`, 
+                         color: 'white', 
+                         padding: '0.25rem 0.75rem', 
+                         borderRadius: 'var(--radius-full)',
+                         fontSize: '0.75rem',
+                         fontWeight: 700,
+                         textTransform: 'uppercase'
+                       }}>{phase.badge}</span>
+                       <h3 style={{ fontSize: '1.75rem', marginTop: '0.75rem' }}>{phase.icon} {phase.title}</h3>
+                    </div>
+                    <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>{phase.duration}</span>
+                  </div>
+                  
+                  <p style={{ fontSize: '1.1rem', color: 'var(--text-muted)', marginBottom: '1.5rem', fontWeight: 500 }}>
+                    {phase.summary}
+                  </p>
+
+                  <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+                    gap: '1rem',
+                    padding: '1.5rem',
+                    backgroundColor: 'var(--bg-alt)',
+                    borderRadius: 'var(--radius-md)',
+                    borderLeft: `4px solid var(--primary)`
+                  }}>
+                    {phase.details.map((detail, i) => (
+                      <div key={i} style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                        <div style={{ color: 'var(--primary)', marginTop: '0.25rem' }}>•</div>
+                        <span style={{ fontSize: '0.95rem', color: 'var(--text-main)', fontWeight: 500 }}>{detail}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)', fontStyle: 'italic', color: 'var(--accent)', fontSize: '0.9rem', fontWeight: 600 }}>
+                    ⚖️ {phase.constitutional}
+                  </div>
                 </div>
               </div>
-
-              {/* Content Card */}
-              <div className="card hover-scale" style={{ flex: 1, borderLeft: `4px solid ${phase.color}` }}>
-                <h3 style={{ color: phase.color, marginBottom: '0.5rem', fontSize: '1.4rem' }}>{phase.title}</h3>
-                <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>{phase.description}</p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>
