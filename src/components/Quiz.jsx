@@ -1,188 +1,212 @@
 import React, { useState } from 'react';
 import { questions, catColors } from '../data/data';
-import { Trophy, RefreshCw, ChevronRight, Check, X } from 'lucide-react';
 
-const Quiz = () => {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [score, setScore] = useState(0);
-  const [showScore, setShowScore] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [isCorrect, setIsCorrect] = useState(null);
+function Results({ answers, score, pct, onRestart, onReview }) {
+  const circumference = 2 * Math.PI * 52;
 
-  const handleAnswerClick = (index) => {
-    if (selectedAnswer !== null) return;
-    
-    setSelectedAnswer(index);
-    const correct = index === questions[currentQuestion].ans;
-    setIsCorrect(correct);
-    if (correct) setScore(score + 1);
-  };
-
-  const handleNextQuestion = () => {
-    const nextQuestion = currentQuestion + 1;
-    if (nextQuestion < questions.length) {
-      setCurrentQuestion(nextQuestion);
-      setSelectedAnswer(null);
-      setIsCorrect(null);
-    } else {
-      setShowScore(true);
-    }
-  };
-
-  const resetQuiz = () => {
-    setCurrentQuestion(0);
-    setScore(0);
-    setShowScore(false);
-    setSelectedAnswer(null);
-    setIsCorrect(null);
-  };
+  const grade =
+    pct >= 90
+      ? { label: 'Constitutional Scholar', icon: '🏆', color: 'gold' }
+      : pct >= 70
+      ? { label: 'Informed Voter', icon: '🗳️', color: 'green' }
+      : pct >= 50
+      ? { label: 'Learning Citizen', icon: '📚', color: 'saffron' }
+      : { label: 'Keep Studying!', icon: '💪', color: 'navy' };
 
   return (
-    <section id="quiz" className="section" style={{ backgroundColor: 'var(--bg-alt)' }}>
+    <section className="quiz-section" id="quiz">
       <div className="container">
-        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-          <span style={{ 
-            color: 'var(--accent)', 
-            fontWeight: 800, 
-            fontSize: '0.9rem', 
-            textTransform: 'uppercase', 
-            letterSpacing: '0.1em' 
-          }}>Knowledge Check</span>
-          <h2 style={{ fontSize: '3rem', marginTop: '0.5rem' }}>Election <span className="gradient-text">Trivia Challenge</span></h2>
+        <div className="results-wrap animate-fadeUp">
+          <div className="results-card card">
+            <div className={`results-header rh-${grade.color}`}>
+              <div className="results-icon">{grade.icon}</div>
+              <h2 className="results-grade">{grade.label}</h2>
+            </div>
+
+            <div className="results-body">
+              <svg viewBox="0 0 120 120" className="score-svg">
+                <circle cx="60" cy="60" r="52" fill="none" stroke="#ECEAE6" strokeWidth="10" />
+                <circle
+                  cx="60" cy="60" r="52" fill="none" stroke="#E8541A" strokeWidth="10"
+                  strokeDasharray={`${circumference * pct / 100} ${circumference}`}
+                  strokeLinecap="round" transform="rotate(-90 60 60)"
+                  style={{ transition: 'stroke-dasharray 1s ease' }}
+                />
+                <text x="60" y="55" textAnchor="middle" fill="#0D1F3C" fontSize="22" fontWeight="900" fontFamily="'Playfair Display',serif">
+                  {pct}%
+                </text>
+                <text x="60" y="72" textAnchor="middle" fill="#6B6663" fontSize="11" fontFamily="'Plus Jakarta Sans',sans-serif">
+                  {score}/{questions.length} correct
+                </text>
+              </svg>
+
+              <div className="results-breakdown">
+                {questions.map((q, i) => (
+                  <div key={i} className={`rb-item ${answers[i] === q.ans ? 'rb-correct' : 'rb-wrong'}`}>
+                    <span className="rb-icon">{answers[i] === q.ans ? '✓' : '✗'}</span>
+                    <span className="rb-qnum">Q{i + 1}</span>
+                    <span className="rb-cat">{q.cat}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="results-actions">
+                <button className="btn btn-primary" onClick={onRestart}>Try Again</button>
+                <button className="btn btn-outline" onClick={onReview}>Review Questions</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const Quiz = () => {
+  const [current, setCurrent] = useState(0);
+  const [answers, setAnswers] = useState(new Array(questions.length).fill(null));
+  const [showResults, setShowResults] = useState(false);
+
+  const score = answers.filter((a, i) => a === questions[i].ans).length;
+  const pct = Math.round((score / questions.length) * 100);
+  const q = questions[current];
+  const isAnswered = answers[current] !== null;
+
+  function answer(i) {
+    if (isAnswered) return;
+    const next = [...answers];
+    next[current] = i;
+    setAnswers(next);
+  }
+
+  function restart() {
+    setCurrent(0);
+    setAnswers(new Array(questions.length).fill(null));
+    setShowResults(false);
+  }
+
+  if (showResults) {
+    return (
+      <Results
+        answers={answers}
+        score={score}
+        pct={pct}
+        onRestart={restart}
+        onReview={() => { setShowResults(false); setCurrent(0); }}
+      />
+    );
+  }
+
+  return (
+    <section className="quiz-section" id="quiz">
+      <div className="container">
+        <div className="section-header">
+          <div className="section-label">Test Your Knowledge</div>
+          <h2 className="section-title">Indian Election Quiz</h2>
+          <p className="section-sub">
+            Test your understanding of the constitutional law, EVMs, VVPATs, and the electoral system.
+          </p>
         </div>
 
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          {showScore ? (
-            <div className="card animate-slide-up" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-              <div style={{ 
-                width: '100px', 
-                height: '100px', 
-                backgroundColor: 'rgba(255,153,51,0.1)', 
-                borderRadius: '50%', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                margin: '0 auto 2rem auto',
-                color: 'var(--primary)'
-              }}>
-                <Trophy size={48} />
-              </div>
-              <h3 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Quiz Completed!</h3>
-              <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', marginBottom: '2.5rem' }}>
-                You scored <strong style={{ color: 'var(--text-main)' }}>{score}</strong> out of <strong style={{ color: 'var(--text-main)' }}>{questions.length}</strong>
-              </p>
-              <button onClick={resetQuiz} className="btn btn-primary hover-scale">
-                <RefreshCw size={20} /> Try Again
-              </button>
+        <div className="quiz-layout">
+          <div className="quiz-nav-sidebar">
+            <div className="qns-header">
+              <span>Questions</span>
+              <span className="qns-score">{score}/{questions.length}</span>
             </div>
-          ) : (
-            <div className="card animate-slide-up" style={{ position: 'relative' }}>
-              {/* Progress Bar */}
-              <div style={{ 
-                position: 'absolute', 
-                top: 0, 
-                left: 0, 
-                width: `${((currentQuestion + 1) / questions.length) * 100}%`, 
-                height: '6px', 
-                backgroundColor: 'var(--primary)',
-                transition: 'width 0.3s ease',
-                borderTopLeftRadius: 'var(--radius-lg)',
-                borderTopRightRadius: currentQuestion === questions.length - 1 ? 'var(--radius-lg)' : '0'
-              }}></div>
+            <div className="qns-grid">
+              {questions.map((_, i) => {
+                const state = answers[i] === null ? 'unanswered' : answers[i] === questions[i].ans ? 'correct' : 'wrong';
+                const isCurrent = i === current;
+                return (
+                  <button
+                    key={i}
+                    className={`qns-btn ${state} ${isCurrent ? 'current' : ''}`}
+                    onClick={() => setCurrent(i)}
+                  >
+                    {i + 1}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="qns-legend">
+              <span className="ql-item ql-correct">Correct</span>
+              <span className="ql-item ql-wrong">Wrong</span>
+              <span className="ql-item ql-unanswered">Not attempted</span>
+            </div>
+          </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', marginTop: '1rem' }}>
-                <span style={{ 
-                  backgroundColor: `var(--accent)`, 
-                  color: 'white', 
-                  padding: '0.25rem 0.8rem', 
-                  borderRadius: 'var(--radius-full)',
-                  fontSize: '0.75rem',
-                  fontWeight: 800
-                }}>
-                  {questions[currentQuestion].cat}
-                </span>
-                <span style={{ color: 'var(--text-muted)', fontWeight: 700, fontSize: '0.9rem' }}>
-                  Question {currentQuestion + 1} of {questions.length}
-                </span>
+          <div className="quiz-panel animate-fadeIn" key={current}>
+            <div className="quiz-panel-header">
+              <div className="qph-left">
+                <span className={`badge badge-${catColors[q.cat] || 'navy'}`}>{q.cat}</span>
+                <span className="qph-num">Question {current + 1} of {questions.length}</span>
               </div>
+              <div className="progress-bar">
+                <div className="progress-fill" style={{ width: `${((current + 1) / questions.length) * 100}%` }}></div>
+              </div>
+            </div>
 
-              <h3 style={{ fontSize: '1.8rem', marginBottom: '2.5rem', lineHeight: 1.3 }}>
-                {questions[currentQuestion].q}
-              </h3>
+            <div className="quiz-question-body">
+              <p className="quiz-question">{q.q}</p>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {questions[currentQuestion].opts.map((option, index) => {
-                  let bgColor = 'var(--surface)';
-                  let borderColor = 'var(--border)';
-                  let textColor = 'var(--text-main)';
-                  
-                  if (selectedAnswer !== null) {
-                    if (index === questions[currentQuestion].ans) {
-                      bgColor = 'rgba(19, 136, 8, 0.1)';
-                      borderColor = 'var(--secondary)';
-                      textColor = 'var(--secondary-dark)';
-                    } else if (index === selectedAnswer) {
-                      bgColor = 'rgba(239, 68, 68, 0.1)';
-                      borderColor = '#ef4444';
-                      textColor = '#b91c1c';
-                    } else {
-                      opacity = 0.5;
-                    }
+              <div className="quiz-options">
+                {q.opts.map((opt, i) => {
+                  let cls = 'quiz-option';
+                  if (isAnswered) {
+                    if (i === q.ans) cls += ' opt-correct';
+                    else if (i === answers[current]) cls += ' opt-wrong';
+                    else cls += ' opt-dim';
                   }
-
                   return (
-                    <button
-                      key={index}
-                      onClick={() => handleAnswerClick(index)}
-                      style={{
-                        padding: '1.25rem 1.5rem',
-                        textAlign: 'left',
-                        borderRadius: 'var(--radius-md)',
-                        border: `2px solid ${borderColor}`,
-                        backgroundColor: bgColor,
-                        color: textColor,
-                        fontSize: '1.05rem',
-                        fontWeight: 600,
-                        transition: 'all 0.2s ease',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        cursor: selectedAnswer === null ? 'pointer' : 'default'
-                      }}
-                      className={selectedAnswer === null ? 'hover-scale' : ''}
-                    >
-                      {option}
-                      {selectedAnswer !== null && index === questions[currentQuestion].ans && <Check size={20} />}
-                      {selectedAnswer !== null && index === selectedAnswer && index !== questions[currentQuestion].ans && <X size={20} />}
+                    <button key={i} className={cls} onClick={() => answer(i)} disabled={isAnswered}>
+                      <div className="opt-label">{String.fromCharCode(65 + i)}</div>
+                      <span style={{ flex: 1 }}>{opt}</span>
+                      {isAnswered && i === q.ans && <span className="opt-check">✓</span>}
+                      {isAnswered && i === answers[current] && answers[current] !== q.ans && <span className="opt-cross">✗</span>}
                     </button>
                   );
                 })}
               </div>
 
-              {selectedAnswer !== null && (
-                <div className="animate-slide-up" style={{ marginTop: '2.5rem' }}>
-                  <div style={{ 
-                    padding: '1.5rem', 
-                    backgroundColor: 'var(--bg-alt)', 
-                    borderRadius: 'var(--radius-md)',
-                    borderLeft: `4px solid ${isCorrect ? 'var(--secondary)' : '#ef4444'}`,
-                    marginBottom: '2rem'
-                  }}>
-                    <strong style={{ display: 'block', marginBottom: '0.5rem', fontSize: '1.1rem' }}>
-                      {isCorrect ? '✨ Correct!' : '❌ Incorrect'}
-                    </strong>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-                      {questions[currentQuestion].exp}
-                    </p>
+              {isAnswered && (
+                <div className={`quiz-feedback animate-fadeIn ${answers[current] === q.ans ? 'fb-correct' : 'fb-wrong'}`}>
+                  <div className="fb-header">
+                    <span className="fb-icon">{answers[current] === q.ans ? '✓' : '✗'}</span>
+                    <strong>{answers[current] === q.ans ? 'Correct!' : 'Incorrect'}</strong>
                   </div>
-                  
-                  <button onClick={handleNextQuestion} className="btn btn-primary" style={{ width: '100%' }}>
-                    {currentQuestion + 1 === questions.length ? 'Show Results' : 'Next Question'} <ChevronRight size={20} />
-                  </button>
+                  <p>{q.exp}</p>
                 </div>
               )}
             </div>
-          )}
+
+            <div className="quiz-footer">
+              <button
+                className="btn btn-ghost"
+                onClick={() => setCurrent(Math.max(0, current - 1))}
+                disabled={current === 0}
+              >
+                ← Prev
+              </button>
+
+              <div style={{ display: 'flex', gap: '10px' }}>
+                {current === questions.length - 1 && answers.filter(a => a !== null).length === questions.length && (
+                  <button className="btn btn-primary" onClick={() => setShowResults(true)}>
+                    See Results 🏆
+                  </button>
+                )}
+                {current < questions.length - 1 && (
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => setCurrent(current + 1)}
+                    disabled={!isAnswered}
+                  >
+                    Next →
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, X, Send, Bot, User, Loader2 } from 'lucide-react';
+import { MessageSquare, X, Send, Bot, User, Loader2, Info } from 'lucide-react';
 
 const QA_DATABASE = {
   'evm': 'EVM (Electronic Voting Machine) consists of a Control Unit and a Ballot Unit. It is secure, standalone, and does NOT connect to the internet. 🛡️',
@@ -11,9 +11,13 @@ const QA_DATABASE = {
   'epic': 'EPIC is the Elector Photo Identity Card, commonly known as the Voter ID. It is your primary document for voting. 📛',
   'mcc': 'Model Code of Conduct (MCC) is a set of guidelines for political parties to ensure fair elections, starting from the announcement of dates. 📜',
   'results': 'Counting of votes happens on a fixed date. VVPAT slips from 5 random polling stations per seat are physically verified against EVM counts. 🔢',
-  'hello': 'Namaste! I am your Bharat Elects assistant. Ask me about EVM, VVPAT, NOTA, or the voting process!',
-  'hi': 'Hello! How can I help you understand the Indian election process today?',
+  'schedule': 'The election schedule is announced by the ECI. It includes dates for nominations, scrutiny, withdrawal, polling, and counting.',
+  'candidate': 'Candidates must be Indian citizens, registered voters, and at least 25 years old for Lok Sabha elections.',
+  'booth': 'A polling booth is where voters go to cast their votes. Each booth usually serves around 1,500 voters.',
+  'registration': 'To vote, you must be registered in the electoral roll of your constituency. You can check your name on the ECI website.',
 };
+
+const SUGGESTIONS = ['EVM security', 'VVPAT slip', 'How to vote', 'Voting age', 'What is NOTA?'];
 
 const ChatAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,50 +33,53 @@ const ChatAssistant = () => {
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, isOpen, isTyping]);
+    if (isOpen) scrollToBottom();
+  }, [messages, isTyping, isOpen]);
 
-  const handleSend = (e) => {
-    e.preventDefault();
-    if (!input.trim()) return;
+  const findResponse = (query) => {
+    const lowercaseQuery = query.toLowerCase();
+    
+    // Check for exact keywords first
+    for (const [key, value] of Object.entries(QA_DATABASE)) {
+      if (lowercaseQuery.includes(key)) {
+        return value;
+      }
+    }
 
-    const userMessage = { text: input, sender: 'user' };
+    // Check for phrases
+    if (lowercaseQuery.includes('how to vote') || lowercaseQuery.includes('voting process')) {
+      return "To vote, you need to go to your designated polling booth with a valid ID (like EPIC). You will be verified, marked with ink, and then you can cast your vote on the EVM. Check the 'EVM Guide' section for a full walkthrough! 🚶‍♂️🗳️";
+    }
+
+    if (lowercaseQuery.includes('security') || lowercaseQuery.includes('hack')) {
+      return "EVMs are highly secure and standalone devices. They are not connected to any network, making them immune to remote hacking. Multiple layers of physical security and mock polls ensure their integrity. 🔒";
+    }
+
+    return "I'm not sure I understand that. Try asking about EVMs, VVPAT, NOTA, Indelible Ink, or the voting process. You can also click the suggestions above! 💡";
+  };
+
+  const handleSend = (text) => {
+    const messageText = text || input;
+    if (!messageText.trim()) return;
+
+    const userMessage = { text: messageText, sender: 'user' };
     setMessages(prev => [...prev, userMessage]);
-    const currentInput = input;
     setInput('');
     setIsTyping(true);
 
-    // Enhanced Keyword Matching Logic
     setTimeout(() => {
-      const lowercaseInput = currentInput.toLowerCase();
-      let responses = [];
-      
-      for (const [key, value] of Object.entries(QA_DATABASE)) {
-        if (lowercaseInput.includes(key)) {
-          responses.push(value);
-        }
-      }
-
-      const botResponseText = responses.length > 0 
-        ? responses.join(' \n\n ') 
-        : "I'm still learning! Try asking about EVMs, VVPAT, NOTA, Indelible Ink, or the Election Commission.";
-
-      setMessages(prev => [...prev, { text: botResponseText, sender: 'bot' }]);
+      const botResponse = findResponse(messageText);
+      setMessages(prev => [...prev, { text: botResponse, sender: 'bot' }]);
       setIsTyping(false);
-    }, 1000);
+    }, 800);
   };
 
   return (
-    <div className="chat-assistant-container" style={{
-      position: 'fixed',
-      bottom: '30px',
-      right: '30px',
-      zIndex: 2000
-    }}>
+    <div className="chat-assistant-container" style={{ position: 'fixed', bottom: '30px', right: '30px', zIndex: 2000 }}>
       {isOpen && (
         <div className="glass chat-window" style={{
-          width: '380px',
-          height: '550px',
+          width: '400px',
+          height: '600px',
           display: 'flex',
           flexDirection: 'column',
           marginBottom: '20px',
@@ -84,7 +91,7 @@ const ChatAssistant = () => {
         }}>
           {/* Header */}
           <div style={{
-            background: 'linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)',
+            background: 'linear-gradient(135deg, var(--saffron) 0%, var(--navy-mid) 100%)',
             color: 'white',
             padding: '20px',
             display: 'flex',
@@ -93,11 +100,11 @@ const ChatAssistant = () => {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ backgroundColor: 'rgba(255,255,255,0.2)', padding: '6px', borderRadius: '50%' }}>
-                <Bot size={20} />
+                <Bot size={22} />
               </div>
               <div>
-                <h4 style={{ margin: 0, fontSize: '1rem' }}>Bharat Elects Bot</h4>
-                <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>Online | AI Assistant</span>
+                <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Bharat Elects Bot</h4>
+                <span style={{ fontSize: '0.75rem', opacity: 0.9 }}>Digital Democracy Guide</span>
               </div>
             </div>
             <button 
@@ -116,8 +123,22 @@ const ChatAssistant = () => {
             display: 'flex',
             flexDirection: 'column',
             gap: '15px',
-            backgroundColor: 'rgba(248, 250, 252, 0.5)'
+            backgroundColor: 'var(--off-white)'
           }}>
+            <div style={{ 
+              backgroundColor: 'rgba(13, 31, 60, 0.05)', 
+              padding: '12px', 
+              borderRadius: 'var(--radius-md)', 
+              fontSize: '0.85rem', 
+              color: 'var(--navy-mid)',
+              display: 'flex',
+              gap: '10px',
+              marginBottom: '10px'
+            }}>
+              <Info size={16} style={{ flexShrink: 0, marginTop: '2px' }} />
+              <span>Ask about the voting process, EVMs, or eligibility! Try a suggestion below.</span>
+            </div>
+
             {messages.map((msg, index) => (
               <div key={index} style={{
                 display: 'flex',
@@ -127,9 +148,9 @@ const ChatAssistant = () => {
               }}>
                 {msg.sender === 'bot' && (
                    <div style={{ 
-                     width: '28px', 
-                     height: '28px', 
-                     backgroundColor: 'var(--primary)', 
+                     width: '32px', 
+                     height: '32px', 
+                     backgroundColor: 'var(--saffron)', 
                      borderRadius: '50%', 
                      display: 'flex', 
                      alignItems: 'center', 
@@ -138,22 +159,23 @@ const ChatAssistant = () => {
                      flexShrink: 0,
                      marginTop: '4px'
                    }}>
-                     <Bot size={14} />
+                     <Bot size={16} />
                    </div>
                 )}
                 
                 <div style={{
                   maxWidth: '80%',
-                  padding: '12px 16px',
+                  padding: '12px 18px',
                   borderRadius: '1.25rem',
                   borderBottomRightRadius: msg.sender === 'user' ? '0.2rem' : '1.25rem',
                   borderBottomLeftRadius: msg.sender === 'bot' ? '0.2rem' : '1.25rem',
-                  backgroundColor: msg.sender === 'user' ? 'var(--accent)' : 'white',
-                  color: msg.sender === 'user' ? 'white' : 'var(--text-main)',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                  backgroundColor: msg.sender === 'user' ? 'var(--navy-mid)' : 'white',
+                  color: msg.sender === 'user' ? 'white' : 'var(--text)',
+                  boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
                   fontSize: '0.95rem',
                   lineHeight: 1.5,
-                  whiteSpace: 'pre-wrap'
+                  whiteSpace: 'pre-wrap',
+                  border: msg.sender === 'bot' ? '1px solid var(--border)' : 'none'
                 }}>
                   {msg.text}
                 </div>
@@ -163,27 +185,59 @@ const ChatAssistant = () => {
             {isTyping && (
               <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                  <div style={{ 
-                     width: '28px', 
-                     height: '28px', 
-                     backgroundColor: 'var(--primary)', 
+                     width: '32px', 
+                     height: '32px', 
+                     backgroundColor: 'var(--saffron)', 
                      borderRadius: '50%', 
                      display: 'flex', 
                      alignItems: 'center', 
                      justifyContent: 'center',
                      color: 'white'
                    }}>
-                     <Bot size={14} />
+                     <Bot size={16} />
                    </div>
                    <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                     Thinking <Loader2 size={12} className="animate-spin" />
+                     Assistant is thinking... <Loader2 size={12} className="animate-spin" />
                    </div>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
+          {/* Suggestions */}
+          <div style={{ 
+            padding: '10px 20px', 
+            display: 'flex', 
+            gap: '8px', 
+            overflowX: 'auto', 
+            backgroundColor: 'var(--off-white)',
+            borderTop: '1px solid var(--border)',
+            scrollbarWidth: 'none'
+          }}>
+            {SUGGESTIONS.map(s => (
+              <button
+                key={s}
+                onClick={() => handleSend(s)}
+                style={{
+                  whiteSpace: 'nowrap',
+                  padding: '6px 12px',
+                  borderRadius: 'var(--radius-full)',
+                  border: '1px solid var(--saffron)',
+                  backgroundColor: 'white',
+                  color: 'var(--saffron)',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+                className="hover-scale"
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+
           {/* Input Area */}
-          <form onSubmit={handleSend} style={{
+          <form onSubmit={(e) => { e.preventDefault(); handleSend(); }} style={{
             padding: '15px 20px',
             borderTop: '1px solid var(--border)',
             display: 'flex',
@@ -194,7 +248,7 @@ const ChatAssistant = () => {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about EVM, VVPAT, NOTA..."
+              placeholder="Ask me anything..."
               style={{
                 flex: 1,
                 padding: '12px 18px',
@@ -202,14 +256,12 @@ const ChatAssistant = () => {
                 border: '1px solid var(--border)',
                 outline: 'none',
                 fontSize: '0.95rem',
-                backgroundColor: 'var(--bg-alt)',
+                backgroundColor: 'var(--gray-50)',
                 transition: 'all 0.2s ease'
               }}
-              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
-              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
             />
             <button type="submit" style={{
-              backgroundColor: 'var(--primary)',
+              backgroundColor: 'var(--saffron)',
               color: 'white',
               border: 'none',
               borderRadius: '50%',
@@ -220,7 +272,7 @@ const ChatAssistant = () => {
               justifyContent: 'center',
               cursor: 'pointer',
               flexShrink: 0,
-              boxShadow: '0 4px 12px var(--primary-glow)'
+              boxShadow: '0 4px 12px rgba(232,84,26,0.3)'
             }} className="hover-scale">
               <Send size={20} />
             </button>
@@ -233,7 +285,7 @@ const ChatAssistant = () => {
         onClick={() => setIsOpen(!isOpen)}
         className="hover-scale hover-glow"
         style={{
-          backgroundColor: 'var(--primary)',
+          backgroundColor: 'var(--saffron)',
           color: 'white',
           border: 'none',
           borderRadius: '50%',
@@ -242,50 +294,12 @@ const ChatAssistant = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 8px 25px var(--primary-glow)',
-          cursor: 'pointer',
-          float: 'right',
-          position: 'relative'
+          boxShadow: '0 8px 25px rgba(232,84,26,0.4)',
+          cursor: 'pointer'
         }}
       >
-        {isOpen ? <X size={32} /> : (
-          <>
-            <MessageSquare size={32} />
-            <div style={{
-              position: 'absolute',
-              top: '-5px',
-              right: '-5px',
-              backgroundColor: 'var(--accent)',
-              color: 'white',
-              width: '24px',
-              height: '24px',
-              borderRadius: '50%',
-              fontSize: '0.75rem',
-              fontWeight: 800,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: '3px solid var(--bg-main)'
-            }}>1</div>
-          </>
-        )}
+        {isOpen ? <X size={32} /> : <MessageSquare size={32} />}
       </button>
-
-      <style>{`
-        .animate-spin {
-          animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @media (max-width: 480px) {
-          .chat-window {
-            width: calc(100vw - 40px) !important;
-            height: 70vh !important;
-          }
-        }
-      `}</style>
     </div>
   );
 };

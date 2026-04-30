@@ -1,102 +1,152 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { guideSteps } from '../data/data';
 
-const Guide = () => {
+function EVMVisual() {
   return (
-    <section id="guide" className="section">
+    <div className="evm-diagram">
+      <div className="evm-unit">
+        <div className="evm-unit-label">Control Unit</div>
+        <div className="evm-unit-body">
+          <div className="evm-screen">READY</div>
+          <div className="evm-buttons-row">
+            <div className="evm-btn-small">CLOSE</div>
+            <div className="evm-btn-small active-btn">BALLOT</div>
+            <div className="evm-btn-small">RESULT</div>
+          </div>
+          <div className="evm-label-small">With Polling Officer</div>
+        </div>
+      </div>
+
+      <div className="evm-cable">———</div>
+
+      <div className="evm-unit">
+        <div className="evm-unit-label">Ballot Unit</div>
+        <div className="evm-unit-body">
+          {['Candidate A 🪷', 'Candidate B ✋', 'NOTA ✗'].map((c, i) => (
+            <div className="evm-candidate-row" key={i}>
+              <span className="evm-cand-num">{i + 1}</span>
+              <span className="evm-cand-name">{c}</span>
+              <div className={`evm-vote-btn ${i === 0 ? 'evm-vote-active' : ''}`}></div>
+            </div>
+          ))}
+          <div className="evm-label-small">Voter Presses Blue Button</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function VVPATVisual() {
+  return (
+    <div className="vvpat-diagram">
+      <div className="vvpat-screen">
+        <div className="vvpat-window">
+          <div className="vvpat-slip">
+            <div className="vs-num">01</div>
+            <div className="vs-symbol">🪷</div>
+            <div className="vs-name">Party — Candidate Name</div>
+          </div>
+        </div>
+        <div className="vvpat-label">Visible for 7 seconds only</div>
+        <div className="vvpat-box">📦 Sealed paper trail box</div>
+      </div>
+    </div>
+  );
+}
+
+const Guide = () => {
+  const [activeStep, setActiveStep] = useState(0);
+  const step = guideSteps[activeStep];
+
+  return (
+    <section className="guide-section" id="guide">
       <div className="container">
-        <div style={{ textAlign: 'center', marginBottom: '5rem' }}>
-           <span style={{ 
-            color: 'var(--secondary)', 
-            fontWeight: 800, 
-            fontSize: '0.9rem', 
-            textTransform: 'uppercase', 
-            letterSpacing: '0.1em' 
-          }}>Voter Education</span>
-          <h2 style={{ fontSize: '3rem', marginTop: '0.5rem' }}>How to <span className="gradient-text">Cast Your Vote</span></h2>
-          <p style={{ color: 'var(--text-muted)', maxWidth: '700px', margin: '1.5rem auto 0 auto', fontSize: '1.1rem' }}>
-            A step-by-step interactive guide to the voting process at the polling station.
+        <div className="section-header">
+          <div className="section-label">How to Vote</div>
+          <h2 className="section-title">EVM & VVPAT Voting Guide</h2>
+          <p className="section-sub">
+            A step-by-step walkthrough of what happens inside a polling station, from entering to casting your vote.
           </p>
         </div>
 
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', 
-          gap: '2.5rem' 
-        }}>
-          {guideSteps.map((step) => (
-            <div key={step.id} className="card hover-scale" style={{ 
-              display: 'flex', 
-              flexDirection: 'column',
-              position: 'relative',
-              overflow: 'hidden'
-            }}>
-              {/* Step number badge */}
-              <div style={{
-                position: 'absolute',
-                top: '-10px',
-                right: '-10px',
-                width: '60px',
-                height: '60px',
-                backgroundColor: 'var(--bg-alt)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.5rem',
-                fontWeight: 800,
-                color: 'var(--border)',
-                opacity: 0.5
-              }}>
-                {step.id}
-              </div>
+        <div className="guide-layout">
+          {/* Sidebar: Step buttons */}
+          <div className="guide-steps">
+            {guideSteps.map((s, i) => (
+              <button
+                key={s.id}
+                className={`guide-step-btn ${activeStep === i ? 'active' : ''} color-${s.color}`}
+                onClick={() => setActiveStep(i)}
+              >
+                <div className="gsb-icon">{s.icon}</div>
+                <div className="gsb-body">
+                  <div className="gsb-num">Step {s.id}</div>
+                  <div className="gsb-title">{s.title}</div>
+                </div>
+                {activeStep === i && <div className="gsb-arrow">→</div>}
+              </button>
+            ))}
+          </div>
 
-              <div style={{ 
-                fontSize: '3rem', 
-                marginBottom: '1.5rem',
-                width: '80px',
-                height: '80px',
-                backgroundColor: `rgba(var(--${step.color}-rgb), 0.1)`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 'var(--radius-md)'
-              }}>
-                {step.icon}
-              </div>
-
-              <h3 style={{ fontSize: '1.6rem', marginBottom: '1rem' }}>{step.title}</h3>
-              <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '1.05rem', lineHeight: 1.6 }}>
-                {step.desc}
-              </p>
-
-              <div style={{ 
-                flex: 1, 
-                backgroundColor: 'var(--bg-alt)', 
-                padding: '1.5rem', 
-                borderRadius: 'var(--radius-md)',
-                marginBottom: '1.5rem'
-              }}>
-                <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                  {step.substeps.map((sub, i) => (
-                    <li key={i} style={{ display: 'flex', gap: '0.75rem', fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-main)' }}>
-                      <span style={{ color: 'var(--secondary)' }}>✓</span> {sub}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div style={{ 
-                padding: '1rem', 
-                border: '1px dashed var(--primary)', 
-                borderRadius: 'var(--radius-sm)',
-                backgroundColor: 'rgba(255,153,51,0.05)',
-                fontSize: '0.85rem'
-              }}>
-                <strong>💡 Pro Tip:</strong> {step.tip}
+          {/* Detail panel */}
+          <div className="guide-detail card animate-fadeIn" key={activeStep}>
+            <div className={`guide-detail-header gd-${step.color}`}>
+              <div className="gd-icon">{step.icon}</div>
+              <div>
+                <div className="gd-step-num">Step {step.id} of {guideSteps.length}</div>
+                <h3 className="gd-title">{step.title}</h3>
               </div>
             </div>
-          ))}
+
+            <div className="guide-detail-body">
+              <p className="gd-desc">{step.desc}</p>
+
+              {step.evmVisual && <EVMVisual />}
+              {step.vvpatVisual && <VVPATVisual />}
+
+              <div className="gd-substeps">
+                {step.substeps.map((s, i) => (
+                  <div className="gd-substep" key={i}>
+                    <div className={`gd-substep-dot dot-${step.color}`}>{i + 1}</div>
+                    <span>{s}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className={`gd-tip tip-${step.color}`}>
+                <span className="tip-icon">💡</span>
+                <p>{step.tip}</p>
+              </div>
+            </div>
+
+            <div className="guide-nav">
+              <button
+                className="btn btn-ghost"
+                onClick={() => setActiveStep(Math.max(0, activeStep - 1))}
+                disabled={activeStep === 0}
+              >
+                ← Previous
+              </button>
+
+              <div className="guide-dots">
+                {guideSteps.map((_, i) => (
+                  <div
+                    key={i}
+                    className={`guide-dot ${i === activeStep ? 'active' : ''}`}
+                    onClick={() => setActiveStep(i)}
+                  ></div>
+                ))}
+              </div>
+
+              <button
+                className="btn btn-primary"
+                onClick={() => setActiveStep(Math.min(guideSteps.length - 1, activeStep + 1))}
+                disabled={activeStep === guideSteps.length - 1}
+              >
+                Next →
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </section>

@@ -1,9 +1,10 @@
-import { heroStats } from '../data'
+import React from 'react';
+import { heroStats } from '../data/data';
 
-const phaseColors = ['#E8541A', '#F0B429', '#A78BFA', '#1AB574', '#60A5FA', '#F472B6']
-const phaseLabels = ['Announcement', 'Nominations', 'Campaigning', 'Polling', 'Counting', 'Results']
+const phaseColors = ['#E8541A', '#F0B429', '#A78BFA', '#1AB574', '#60A5FA', '#F472B6'];
+const phaseLabels = ['Announcement', 'Nominations', 'Campaigning', 'Polling', 'Counting', 'Results'];
 
-export default function Hero() {
+const Hero = () => {
   return (
     <section className="hero" id="overview">
       <div className="hero-bg">
@@ -16,18 +17,15 @@ export default function Hero() {
       <div className="container hero-content">
         {/* Left: Text */}
         <div className="hero-text animate-fadeUp">
-          {/* ✏️ UPDATE: Edit eyebrow label */}
           <div className="hero-eyebrow">
             <span className="eyebrow-dot"></span>World's Largest Democracy
           </div>
 
-          {/* ✏️ UPDATE: Edit main headline */}
           <h1 className="hero-title">
             Understand India's<br />
             <span className="hero-title-accent">Election Process</span>
           </h1>
 
-          {/* ✏️ UPDATE: Edit hero description */}
           <p className="hero-desc">
             From announcement to government formation — explore every step, understand EVMs & VVPATs,
             and test your knowledge of Bharat's democratic process.
@@ -48,8 +46,7 @@ export default function Hero() {
               <div className="hc-dot hc-saffron"></div>
               <div className="hc-dot hc-gold"></div>
               <div className="hc-dot hc-green"></div>
-              {/* ✏️ UPDATE: Change card title */}
-              <span className="hc-title">India's 2024 General Election</span>
+              <span className="hc-title">India's General Election</span>
             </div>
             <div className="hero-card-body">
               <div className="hc-phases">
@@ -64,7 +61,6 @@ export default function Hero() {
                 ))}
               </div>
               <div className="hc-divider"></div>
-              {/* ✏️ UPDATE: Edit the 3 stat boxes inside the card */}
               <div className="hc-info">
                 <div className="hc-info-item">
                   <div className="hc-info-label">Phases</div>
@@ -72,7 +68,7 @@ export default function Hero() {
                 </div>
                 <div className="hc-info-item">
                   <div className="hc-info-label">Turnout</div>
-                  <div className="hc-info-val green">66.1%</div>
+                  <div className="hc-info-val green">66.4%</div>
                 </div>
                 <div className="hc-info-item">
                   <div className="hc-info-label">EVMs Used</div>
@@ -81,7 +77,6 @@ export default function Hero() {
               </div>
             </div>
           </div>
-          {/* ✏️ UPDATE: Edit the floating badge text */}
           <div className="hero-badge-float">🏆 Largest election in human history</div>
         </div>
       </div>
@@ -91,7 +86,7 @@ export default function Hero() {
         <div className="container">
           <div className="stats-row">
             {heroStats.map((s, i) => (
-              <div className="stat-item" key={s.num} style={{ animationDelay: `${0.5 + i * 0.1}s` }}>
+              <div className="stat-item" key={s.label} style={{ animationDelay: `${0.5 + i * 0.1}s` }}>
                 <div className="stat-num">{s.num}</div>
                 <div className="stat-label">{s.label}</div>
               </div>
@@ -100,5 +95,7 @@ export default function Hero() {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
+
+export default Hero;
