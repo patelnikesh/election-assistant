@@ -58,7 +58,7 @@ const ChatAssistant = () => {
     return "I'm not sure I understand that. Try asking about EVMs, VVPAT, NOTA, Indelible Ink, or the voting process. You can also click the suggestions above! 💡";
   };
 
-  const handleSend = (text) => {
+  const handleSend = async (text) => {
     const messageText = text || input;
     if (!messageText.trim()) return;
 
@@ -67,37 +67,39 @@ const ChatAssistant = () => {
     setInput('');
     setIsTyping(true);
 
-    setTimeout(() => {
-      const botResponse = findResponse(messageText);
-      setMessages(prev => [...prev, { text: botResponse, sender: 'bot' }]);
+    try {
+      const response = await fetch('http://localhost:5000/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: messageText }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Backend error');
+      }
+
+      const data = await response.json();
+      setMessages(prev => [...prev, { text: data.response, sender: 'bot' }]);
+    } catch (error) {
+      console.error('Error:', error);
+      // Fallback to local logic if backend fails
+      setTimeout(() => {
+        const botResponse = findResponse(messageText);
+        setMessages(prev => [...prev, { text: botResponse, sender: 'bot' }]);
+      }, 500);
+    } finally {
       setIsTyping(false);
-    }, 800);
+    }
   };
 
   return (
     <div className="chat-assistant-container" style={{ position: 'fixed', bottom: '30px', right: '30px', zIndex: 2000 }}>
       {isOpen && (
-        <div className="glass chat-window" style={{
-          width: '400px',
-          height: '600px',
-          display: 'flex',
-          flexDirection: 'column',
-          marginBottom: '20px',
-          overflow: 'hidden',
-          borderRadius: 'var(--radius-xl)',
-          boxShadow: 'var(--shadow-lg)',
-          border: '1px solid var(--border)',
-          animation: 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
-        }}>
+        <div className="glass chat-window">
           {/* Header */}
-          <div style={{
-            background: 'linear-gradient(135deg, var(--saffron) 0%, var(--navy-mid) 100%)',
-            color: 'white',
-            padding: '20px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
+          <div className="chat-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ backgroundColor: 'rgba(255,255,255,0.2)', padding: '6px', borderRadius: '50%' }}>
                 <Bot size={22} />
@@ -110,21 +112,14 @@ const ChatAssistant = () => {
             <button 
               onClick={() => setIsOpen(false)}
               style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: '4px' }}
+              aria-label="Close chat"
             >
               <X size={20} />
             </button>
           </div>
 
           {/* Messages */}
-          <div style={{
-            flex: 1,
-            padding: '20px',
-            overflowY: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '15px',
-            backgroundColor: 'var(--off-white)'
-          }}>
+          <div className="chat-messages">
             <div style={{ 
               backgroundColor: 'rgba(13, 31, 60, 0.05)', 
               padding: '12px', 
@@ -218,18 +213,8 @@ const ChatAssistant = () => {
               <button
                 key={s}
                 onClick={() => handleSend(s)}
-                style={{
-                  whiteSpace: 'nowrap',
-                  padding: '6px 12px',
-                  borderRadius: 'var(--radius-full)',
-                  border: '1px solid var(--saffron)',
-                  backgroundColor: 'white',
-                  color: 'var(--saffron)',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
-                  cursor: 'pointer'
-                }}
-                className="hover-scale"
+                className="chat-suggestion-btn hover-scale"
+                aria-label={`Ask about ${s}`}
               >
                 {s}
               </button>
@@ -237,13 +222,7 @@ const ChatAssistant = () => {
           </div>
 
           {/* Input Area */}
-          <form onSubmit={(e) => { e.preventDefault(); handleSend(); }} style={{
-            padding: '15px 20px',
-            borderTop: '1px solid var(--border)',
-            display: 'flex',
-            gap: '10px',
-            backgroundColor: 'white'
-          }}>
+          <form onSubmit={(e) => { e.preventDefault(); handleSend(); }} className="chat-input-area">
             <input
               type="text"
               value={input}
@@ -259,6 +238,7 @@ const ChatAssistant = () => {
                 backgroundColor: 'var(--gray-50)',
                 transition: 'all 0.2s ease'
               }}
+              aria-label="Chat input"
             />
             <button type="submit" style={{
               backgroundColor: 'var(--saffron)',
@@ -273,7 +253,7 @@ const ChatAssistant = () => {
               cursor: 'pointer',
               flexShrink: 0,
               boxShadow: '0 4px 12px rgba(232,84,26,0.3)'
-            }} className="hover-scale">
+            }} className="hover-scale" aria-label="Send message">
               <Send size={20} />
             </button>
           </form>

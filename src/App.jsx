@@ -3,6 +3,7 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import Timeline from './components/Timeline';
 import Guide from './components/Guide';
+import Flashcards from './components/Flashcards';
 import Quiz from './components/Quiz';
 import Footer from './components/Footer';
 import ChatAssistant from './components/ChatAssistant';
@@ -13,7 +14,7 @@ function App() {
     <div className="app-container">
       <Header />
       
-      <main className="main-content">
+      <main className="main-content" id="main-content">
         <Hero />
         
         <div id="timeline">
@@ -22,6 +23,10 @@ function App() {
         
         <div id="guide">
           <Guide />
+        </div>
+
+        <div id="flashcards">
+          <Flashcards />
         </div>
         
         <div id="quiz">

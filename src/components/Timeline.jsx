@@ -28,7 +28,15 @@ const Timeline = () => {
                 <div className={`tl-dot tl-dot-${phase.badgeType}`}>{phase.icon}</div>
               </div>
 
-              <div className="tl-card card" onClick={() => setActive(active === i ? null : i)}>
+              <div 
+                className={`tl-card card ${active === i ? 'expanded' : ''}`} 
+                onClick={() => setActive(active === i ? null : i)}
+                role="button"
+                aria-expanded={active === i}
+                aria-label={`Show more details for ${phase.title}`}
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setActive(active === i ? null : i); }}
+              >
                 <div className="tl-card-header">
                   <div className="tl-meta">
                     <span className={`badge badge-${phase.badgeType}`}>{phase.badge}</span>
@@ -41,7 +49,7 @@ const Timeline = () => {
                 <p className="tl-summary">{phase.summary}</p>
 
                 {active === i && (
-                  <div className="tl-expanded animate-fadeIn">
+                  <div className="tl-expanded animate-fadeIn" id={`tl-details-${i}`}>
                     <div className="tl-details">
                       {phase.details.map((d, j) => (
                         <div className="tl-detail-item" key={j}>
@@ -57,7 +65,10 @@ const Timeline = () => {
                   </div>
                 )}
 
-                <button className="tl-toggle">
+                <button 
+                  className="tl-toggle"
+                  aria-hidden="true"
+                >
                   {active === i ? '↑ Less' : '↓ More details'}
                 </button>
               </div>

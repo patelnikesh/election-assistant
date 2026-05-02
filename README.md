@@ -9,7 +9,7 @@ Bharat Elects is a premium, interactive web application designed to simplify the
 - **EVM & VVPAT Simulator**: Understand how Electronic Voting Machines and Paper Audit Trails work.
 - **Knowledge Quiz**: Challenge yourself with trivia about Indian constitutional laws and election rules.
 - **Terminology Flashcards**: Master key terms like NOTA, EPIC, and Model Code of Conduct.
-- **AI Chat Assistant**: A smart keyword-based bot to answer your immediate questions about the election process.
+- **AI Chat Assistant**: A smart assistant powered by **Google Gemini AI** to answer your questions about the Indian election process.
 
 ## 🎨 Design Philosophy
 
@@ -22,28 +22,52 @@ The application uses a **Premium Design System** inspired by the Indian flag:
 ## 🛠️ Technology Stack
 
 - **Frontend**: React (Vite)
+- **Backend**: Flask (Python)
+- **AI Integration**: Google Gemini AI (gemini-1.5-flash)
 - **Styling**: Vanilla CSS with a custom design system
 - **Icons**: Lucide React
+- **Testing**: Vitest (Frontend), Pytest (Backend)
 - **Deployment**: Google Cloud Run & GitHub
 
 ## 🚀 Getting Started
 
-1.  **Clone the repository**:
-    ```bash
-    git clone https://github.com/patelnikesh/election-assistant.git
-    ```
-2.  **Install dependencies**:
-    ```bash
-    npm install
-    ```
-3.  **Run locally**:
-    ```bash
-    npm run dev
-    ```
-4.  **Build for production**:
-    ```bash
-    npm run build
-    ```
+### 1. Prerequisites
+- Node.js (v18+)
+- Python (3.9+)
+- Google Gemini API Key
+
+### 2. Setup Backend
+1. Navigate to the `backend` directory:
+   ```bash
+   cd backend
+   ```
+2. Create a `.env` file and add your Gemini API key:
+   ```env
+   GEMINI_API_KEY=your_api_key_here
+   ```
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. Run the Flask server:
+   ```bash
+   python app.py
+   ```
+
+### 3. Setup Frontend
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+### 4. Running Tests
+- **Frontend**: `npm test`
+- **Backend**: `python -m pytest backend/`
+
 
 ## 🛡️ Disclaimer
 

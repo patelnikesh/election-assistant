@@ -52,7 +52,20 @@ function Results({ answers, score, pct, onRestart, onReview }) {
 
               <div className="results-actions">
                 <button className="btn btn-primary" onClick={onRestart}>Try Again</button>
-                <button className="btn btn-outline" onClick={onReview}>Review Questions</button>
+                <button 
+                  className="btn btn-outline" 
+                  onClick={() => {
+                    const text = `I just scored ${score}/${questions.length} (${pct}%) on the Bharat Elects Quiz! 🗳️\nTest your election knowledge here!`;
+                    if (navigator.share) {
+                      navigator.share({ title: 'Bharat Elects Quiz', text, url: window.location.href });
+                    } else {
+                      navigator.clipboard.writeText(text);
+                      alert('Result copied to clipboard! 📋');
+                    }
+                  }}
+                >
+                  Share Results 📤
+                </button>
               </div>
             </div>
           </div>
